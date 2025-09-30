@@ -1,0 +1,11 @@
+/Users/jannekemi/repos/temp/innovia-iot-monorepo/src/Innovia.Shared/bin/Debug/net8.0/Innovia.Shared.deps.json
+/Users/jannekemi/repos/temp/innovia-iot-monorepo/src/Innovia.Shared/bin/Debug/net8.0/Innovia.Shared.dll
+/Users/jannekemi/repos/temp/innovia-iot-monorepo/src/Innovia.Shared/bin/Debug/net8.0/Innovia.Shared.pdb
+/Users/jannekemi/repos/temp/innovia-iot-monorepo/src/Innovia.Shared/obj/Debug/net8.0/Innovia.Shared.GeneratedMSBuildEditorConfig.editorconfig
+/Users/jannekemi/repos/temp/innovia-iot-monorepo/src/Innovia.Shared/obj/Debug/net8.0/Innovia.Shared.AssemblyInfoInputs.cache
+/Users/jannekemi/repos/temp/innovia-iot-monorepo/src/Innovia.Shared/obj/Debug/net8.0/Innovia.Shared.AssemblyInfo.cs
+/Users/jannekemi/repos/temp/innovia-iot-monorepo/src/Innovia.Shared/obj/Debug/net8.0/Innovia.Shared.csproj.CoreCompileInputs.cache
+/Users/jannekemi/repos/temp/innovia-iot-monorepo/src/Innovia.Shared/obj/Debug/net8.0/Innovia.Shared.dll
+/Users/jannekemi/repos/temp/innovia-iot-monorepo/src/Innovia.Shared/obj/Debug/net8.0/refint/Innovia.Shared.dll
+/Users/jannekemi/repos/temp/innovia-iot-monorepo/src/Innovia.Shared/obj/Debug/net8.0/Innovia.Shared.pdb
+/Users/jannekemi/repos/temp/innovia-iot-monorepo/src/Innovia.Shared/obj/Debug/net8.0/ref/Innovia.Shared.dll

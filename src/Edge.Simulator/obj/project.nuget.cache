@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "dgSpecHash": "3HzdNbp1ME4=",
+  "success": true,
+  "projectFilePath": "/Users/jannekemi/repos/temp/innovia-iot-monorepo/src/Edge.Simulator/Edge.Simulator.csproj",
+  "expectedPackageFiles": [
+    "/Users/jannekemi/.nuget/packages/mqttnet/5.0.0.1405/mqttnet.5.0.0.1405.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1603",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Edge.Simulator depends on MQTTnet (>= 4.3.13.999) but MQTTnet 4.3.13.999 was not found. MQTTnet 5.0.0.1405 was resolved instead.",
+      "libraryId": "MQTTnet",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    }
+  ]
+}
