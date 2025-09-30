@@ -6,7 +6,7 @@ if (app.Environment.IsDevelopment()) { app.UseSwagger(); app.UseSwaggerUI(); }
 
 app.MapGet("/portal/{tenant}/rooms/{roomId}/latest", (string tenant, Guid roomId) => Results.Ok(new {
     roomId,
-    metrics = new [] { new { type = "co2", value = 950, unit = "ppm" }, new { type = "temperature", value = 22.4, unit = "C" } }
+    metrics = new [] { new { type = "co2", value = 950.0, unit = "ppm" }, new { type = "temperature", value = 22.4, unit = "C" } }
 }));
 
 app.MapGet("/portal/{tenant}/devices/{deviceId}/series", (string tenant, Guid deviceId, string type, DateTimeOffset from, DateTimeOffset to) =>
