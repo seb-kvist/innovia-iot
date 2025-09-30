@@ -1,5 +1,0 @@
-/Users/jannekemi/repos/temp/innovia-iot-monorepo/src/Edge.Simulator/obj/Debug/net8.0/Edge.Simulator.csproj.AssemblyReference.cache
-/Users/jannekemi/repos/temp/innovia-iot-monorepo/src/Edge.Simulator/obj/Debug/net8.0/Edge.Simulator.GeneratedMSBuildEditorConfig.editorconfig
-/Users/jannekemi/repos/temp/innovia-iot-monorepo/src/Edge.Simulator/obj/Debug/net8.0/Edge.Simulator.AssemblyInfoInputs.cache
-/Users/jannekemi/repos/temp/innovia-iot-monorepo/src/Edge.Simulator/obj/Debug/net8.0/Edge.Simulator.AssemblyInfo.cs
-/Users/jannekemi/repos/temp/innovia-iot-monorepo/src/Edge.Simulator/obj/Debug/net8.0/Edge.Simulator.csproj.CoreCompileInputs.cache
