@@ -1,6 +1,0 @@
-/Users/jannekemi/repos/temp/innovia-iot-monorepo/src/Portal.Adapter/obj/Debug/net8.0/Portal.Adapter.csproj.AssemblyReference.cache
-/Users/jannekemi/repos/temp/innovia-iot-monorepo/src/Portal.Adapter/obj/Debug/net8.0/Portal.Adapter.GeneratedMSBuildEditorConfig.editorconfig
-/Users/jannekemi/repos/temp/innovia-iot-monorepo/src/Portal.Adapter/obj/Debug/net8.0/Portal.Adapter.AssemblyInfoInputs.cache
-/Users/jannekemi/repos/temp/innovia-iot-monorepo/src/Portal.Adapter/obj/Debug/net8.0/Portal.Adapter.AssemblyInfo.cs
-/Users/jannekemi/repos/temp/innovia-iot-monorepo/src/Portal.Adapter/obj/Debug/net8.0/Portal.Adapter.csproj.CoreCompileInputs.cache
-/Users/jannekemi/repos/temp/innovia-iot-monorepo/src/Portal.Adapter/obj/Debug/net8.0/Portal.Adapter.MvcApplicationPartsAssemblyInfo.cache
