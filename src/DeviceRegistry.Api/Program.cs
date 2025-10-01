@@ -8,11 +8,15 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+// Enable Swagger always (not only in Development)
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "DeviceRegistry.Api v1");
+    c.RoutePrefix = "swagger";
+});
+// Redirect root to Swagger UI for convenience
+app.MapGet("/", () => Results.Redirect("/swagger"));
 
 app.MapPost("/api/tenants", async (InnoviaDbContext db, Tenant t) => {
     db.Tenants.Add(t); await db.SaveChangesAsync(); return Results.Created($"/api/tenants/{t.Id}", t);
