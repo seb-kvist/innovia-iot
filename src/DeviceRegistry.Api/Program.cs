@@ -8,6 +8,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
+// Ensure database and tables exist (quick-start dev convenience)
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<InnoviaDbContext>();
+    db.Database.EnsureCreated();
+}
+
 // Enable Swagger always (not only in Development)
 app.UseSwagger();
 app.UseSwaggerUI(c =>

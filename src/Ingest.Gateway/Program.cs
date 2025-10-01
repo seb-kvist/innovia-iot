@@ -10,6 +10,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
+// Ensure database and tables exist (quick-start dev convenience)
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<IngestDbContext>();
+    db.Database.EnsureCreated();
+}
+
 // Enable Swagger always (not only in Development)
 app.UseSwagger();
 app.UseSwaggerUI(c =>
@@ -33,6 +40,13 @@ app.Run();
 public class IngestDbContext : DbContext
 {
     public IngestDbContext(DbContextOptions<IngestDbContext> o) : base(o) {}
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<MeasurementRow>().ToTable("Measurements");
+        base.OnModelCreating(modelBuilder);
+    }
+
     public DbSet<MeasurementRow> Measurements => Set<MeasurementRow>();
 }
 public class MeasurementRow
