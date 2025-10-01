@@ -2,8 +2,8 @@ using MQTTnet;
 using MQTTnet.Client;
 using System.Text.Json;
 
-var clientFactory = new MqttClientFactory();
-var client = clientFactory.CreateMqttClient();
+var factory = new MqttFactory();
+var client = factory.CreateMqttClient();
 
 var options = new MqttClientOptionsBuilder()
     .WithTcpServer("localhost", 1883)
