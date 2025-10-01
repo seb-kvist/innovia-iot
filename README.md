@@ -1,9 +1,8 @@
 # Innovia Hub – IoT API (Monorepo, .NET 8)
 
-Ett övningssystem för ett kontorshotell (Innovia Hub) som vill koppla upp sensorer via en inköpt IoT-tjänst.
-Repo innehåller flera tjänster (Device Registry, Ingest Gateway, Realtime Hub, Portal Adapter, Rules Engine) samt en Edge-simulator.
+Innovia Hub is a comprehensive IoT platform for smart buildings and office hubs, enabling organizations to seamlessly connect, manage, and monitor IoT devices and sensors at scale. The system provides robust APIs and real-time data integration for efficient facility management and automation.
 
-> **Mål**: Studenterna ska kunna klona, starta via Docker Compose, läsa kodbasen, konfigurera tenant/rum/device, simulera data och integrera sin egen portal via REST/SignalR/Webhooks.
+This monorepo contains all core services: Device Registry, Ingest Gateway, Realtime Hub, Portal Adapter, and Rules Engine, as well as an Edge Simulator for device and data testing.
 
 ## Arkitektur
 - **DeviceRegistry.Api** – Web API för tenants/sites/rooms/devices/sensors och nyckelhantering (EF Core, PostgreSQL).
