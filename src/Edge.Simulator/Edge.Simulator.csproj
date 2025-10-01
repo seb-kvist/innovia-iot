@@ -6,6 +6,5 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MQTTnet" Version="5.0.0.1405" />
-    <PackageReference Include="MQTTnet.Client" Version="5.0.0.1405" />
   </ItemGroup>
 </Project>
