@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MQTTnet" Version="4.3.15" />
+    <PackageReference Include="MQTTnet" Version="5.0.0.1405" />
+    <PackageReference Include="MQTTnet.Client" Version="5.0.0.1405" />
   </ItemGroup>
 </Project>
