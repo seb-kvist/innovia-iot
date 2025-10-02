@@ -26,6 +26,77 @@ Databas: **PostgreSQL (TimescaleDB-kompatibel)**. Cache/queue: **Redis**. MQTT: 
 
 Se `docs/architecture.md` och `docs/api-specs.md` för detaljer.
 
+## Guider: Köra och använda systemet
+
+### 1. Starta systemet
+- Säkerställ att **Docker Desktop** körs.
+- Kör `docker compose -f deploy/docker-compose.yml up -d` för att starta databasen (Postgres), Redis och Mosquitto.
+- Verifiera att containrarna är igång: `docker ps`.
+
+### 2. Starta tjänsterna
+- Öppna separata terminaler för varje tjänst:
+  ```bash
+  cd src/DeviceRegistry.Api && dotnet run
+  cd src/Ingest.Gateway && dotnet run
+  cd src/Realtime.Hub && dotnet run
+  cd src/Portal.Adapter && dotnet run
+  ```
+- Swagger finns på respektive port, t.ex. http://localhost:5101/swagger.
+
+### 3. Skapa en tenant och en device
+- Skapa tenant via DeviceRegistry:
+  ```bash
+  curl -X POST http://localhost:5101/api/tenants \
+    -H "Content-Type: application/json" \
+    -d '{ "name": "Innovia Hub", "slug": "innovia" }'
+  ```
+- Skapa en device under tenant:
+  ```bash
+  curl -X POST http://localhost:5101/api/tenants/<TENANT_ID>/devices \
+    -H "Content-Type: application/json" \
+    -d '{ "model":"Acme CO2-Temp", "serial":"dev-101", "status":"active" }'
+  ```
+
+### 4. Skicka in mätdata
+- Via Ingest HTTP:
+  ```bash
+  curl -X POST http://localhost:5102/ingest/http/innovia \
+    -H "Content-Type: application/json" \
+    -d '{
+      "deviceId": "dev-101",
+      "apiKey": "dev-101-key",
+      "timestamp": "2025-10-01T12:00:00Z",
+      "metrics": [
+        { "type": "temperature", "value": 22.5, "unit": "C" },
+        { "type": "co2", "value": 1000, "unit": "ppm" }
+      ]
+    }'
+  ```
+
+### 5. Läs data via Portal.Adapter
+- Hämta mätserier:
+  ```bash
+  curl "http://localhost:5104/portal/innovia/devices/<DEVICE_ID>/series?type=co2&from=2025-09-01T00:00:00Z&to=2025-10-01T23:59:59Z"
+  ```
+- Du får tillbaka JSON med tidsstämplade datapunkter.
+
+### 6. Realtidsdata
+- Anslut till SignalR-hubben (Realtime.Hub) på `http://localhost:5103/hub/telemetry`.
+- Exempel i JavaScript:
+  ```js
+  const connection = new signalR.HubConnectionBuilder()
+    .withUrl("http://localhost:5103/hub/telemetry")
+    .build();
+  await connection.start();
+  await connection.invoke("JoinTenant", "innovia");
+  connection.on("measurementReceived", data => console.log("Realtime:", data));
+  ```
+
+### 7. Tips
+- Använd Swagger för att testa endpoints.
+- Kolla databasen med `docker exec -it <db-container> psql -U postgres -d innovia -c "\dt"`.
+- Kombinera DeviceRegistry + Ingest + Portal.Adapter för end-to-end-flöde.
+
 ## Ports (förslag)
 - DeviceRegistry.Api: http://localhost:5101
 - Ingest.Gateway:    http://localhost:5102
