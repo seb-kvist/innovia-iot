@@ -31,7 +31,7 @@ app.MapGet("/portal/{tenant}/rooms/{roomId}/latest", (string tenant, Guid roomId
 }));
 
 app.MapGet("/portal/{tenant}/devices/{deviceId}/series",
-    async (string tenant, Guid deviceId, string type, DateTimeOffset from, DateTimeOffset to, PortalDbContext db) =>
+    async (Guid tenant, Guid deviceId, string type, DateTimeOffset from, DateTimeOffset to, PortalDbContext db) =>
 {
     var points = await db.Measurements
         .Where(m => m.DeviceId == deviceId && m.Type == type && m.Time >= from && m.Time <= to)
@@ -40,6 +40,44 @@ app.MapGet("/portal/{tenant}/devices/{deviceId}/series",
         .ToListAsync();
 
     return Results.Ok(new { deviceId, type, from, to, points });
+});
+
+// Return ALL measurements for a device (optionally filter by type/from/to)
+app.MapGet("/portal/{tenant}/devices/{deviceId}/measurements",
+    async (Guid tenant, Guid deviceId, DateTimeOffset? from, DateTimeOffset? to, string? type, PortalDbContext db) =>
+{
+    var q = db.Measurements.Where(m => m.DeviceId == deviceId);
+    if (from is { } f) q = q.Where(m => m.Time >= f);
+    if (to is { } t) q = q.Where(m => m.Time <= t);
+    if (!string.IsNullOrWhiteSpace(type)) q = q.Where(m => m.Type == type);
+
+    var rows = await q
+        .OrderBy(m => m.Time)
+        .Select(m => new { time = m.Time, type = m.Type, value = m.Value })
+        .ToListAsync();
+
+    return Results.Ok(new { deviceId, count = rows.Count, from, to, type, measurements = rows });
+});
+
+// Return ALL series for a device grouped per type (points per type)
+app.MapGet("/portal/{tenant}/devices/{deviceId}/series/all",
+    async (Guid tenant, Guid deviceId, DateTimeOffset? from, DateTimeOffset? to, PortalDbContext db) =>
+{
+    var q = db.Measurements.Where(m => m.DeviceId == deviceId);
+    if (from is { } f) q = q.Where(m => m.Time >= f);
+    if (to is { } t) q = q.Where(m => m.Time <= t);
+
+    var grouped = await q
+        .OrderBy(m => m.Time)
+        .GroupBy(m => m.Type)
+        .Select(g => new
+        {
+            type = g.Key,
+            points = g.Select(m => new { t = m.Time, v = m.Value })
+        })
+        .ToListAsync();
+
+    return Results.Ok(new { deviceId, from, to, series = grouped });
 });
 
 app.Run();

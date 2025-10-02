@@ -16,13 +16,19 @@ Databas: **PostgreSQL (TimescaleDB-kompatibel)**. Cache/queue: **Redis**. MQTT: 
 
 ## Snabbstart
 1. Installera **Docker** & **Docker Compose** och **.NET 8 SDK**.
-2. `docker compose -f deploy/docker-compose.yml up -d` (startar db/redis/mosquitto)
-3. I ett nytt terminalfönster, kör tjänsterna lokalt (exempel):
+2. Kör installationsscriptet för att skapa lösningen och lägga till alla projekt:
+   ```powershell
+   ./scripts/setup.ps1
+   ```
+   (Detta skapar `Innovia.IoT.sln` och lägger in alla projekt.)
+   - Alternativt installera powershell extension till vsc och installera genom att köra filen. 
+3. `docker compose -f deploy/docker-compose.yml up -d` (startar db/redis/mosquitto)
+4. I ett nytt terminalfönster, kör tjänsterna lokalt (exempel):
    - `dotnet restore`
    - `dotnet build`
    - Starta **DeviceRegistry.Api**, **Ingest.Gateway**, **Realtime.Hub**, **Portal.Adapter** (varsin terminal)
-4. Kör **Edge.Simulator** för att skicka data via MQTT.
-5. Koppla din egen portal mot **Realtime.Hub** (SignalR) och **Portal.Adapter** (REST).
+5. Kör **Edge.Simulator** för att skicka data via MQTT.
+6. Koppla din egen portal mot **Realtime.Hub** (SignalR) och **Portal.Adapter** (REST).
 
 Se `docs/architecture.md` och `docs/api-specs.md` för detaljer.
 

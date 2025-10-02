@@ -35,8 +35,35 @@ app.MapPost("/api/tenants/{tenantId:guid}/devices", async (Guid tenantId, Innovi
     return Results.Created($"/api/tenants/{tenantId}/devices/{d.Id}", d);
 });
 
+
 app.MapGet("/api/tenants/{tenantId:guid}/devices/{deviceId:guid}", async (Guid tenantId, Guid deviceId, InnoviaDbContext db) => {
     var d = await db.Devices.FirstOrDefaultAsync(x => x.TenantId == tenantId && x.Id == deviceId);
+    return d is null ? Results.NotFound() : Results.Ok(d);
+});
+
+// List all devices for a tenant
+app.MapGet("/api/tenants/{tenantId:guid}/devices",
+    async (Guid tenantId, InnoviaDbContext db) =>
+{
+    var list = await db.Devices
+        .Where(d => d.TenantId == tenantId)
+        .ToListAsync();
+    return Results.Ok(list);
+});
+
+// Lookup tenant by slug (for cross-service resolution)
+app.MapGet("/api/tenants/by-slug/{slug}",
+    async (string slug, InnoviaDbContext db) =>
+{
+    var t = await db.Tenants.FirstOrDefaultAsync(x => x.Slug == slug);
+    return t is null ? Results.NotFound() : Results.Ok(t);
+});
+
+// Lookup device by serial within a tenant (for cross-service resolution)
+app.MapGet("/api/tenants/{tenantId:guid}/devices/by-serial/{serial}",
+    async (Guid tenantId, string serial, InnoviaDbContext db) =>
+{
+    var d = await db.Devices.FirstOrDefaultAsync(x => x.TenantId == tenantId && x.Serial == serial);
     return d is null ? Results.NotFound() : Results.Ok(d);
 });
 
