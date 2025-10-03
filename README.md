@@ -4,66 +4,66 @@ Innovia Hub is a comprehensive IoT platform for smart buildings and office hubs,
 
 This monorepo contains all core services: Device Registry, Ingest Gateway, Realtime Hub, Portal Adapter, and Rules Engine, as well as an Edge Simulator for device and data testing.
 
-## Arkitektur
-- **DeviceRegistry.Api** – Web API för tenants/sites/rooms/devices/sensors och nyckelhantering (EF Core, PostgreSQL).
-- **Ingest.Gateway** – HTTP-ingest + MQTT-konsument som normaliserar och sparar mätdata (EF Core).
-- **Realtime.Hub** – SignalR-hub som pushar senaste värden per tenant/room/device.
-- **Portal.Adapter** – Förenklade endpoints för externa portaler + (plats för) webhooks.
-- **Rules.Engine** – Worker Service som kör regler och skapar alerts.
-- **Edge.Simulator** – Konsolapp som publicerar MQTT-mätningar.
+## Architecture
+- **DeviceRegistry.Api** – Web API for tenants/sites/rooms/devices/sensors and key management (EF Core, PostgreSQL).
+- **Ingest.Gateway** – HTTP-ingest + MQTT-consumer that normalizes and stores measurement data (EF Core).
+- **Realtime.Hub** – SignalR hub that pushes the latest values per tenant/room/device.
+- **Portal.Adapter** – Simplified endpoints for external portals + (placeholder for) webhooks.
+- **Rules.Engine** – Worker Service that runs rules and generates alerts.
+- **Edge.Simulator** – Console app that publishes MQTT measurements.
 
-Databas: **PostgreSQL (TimescaleDB-kompatibel)**. Cache/queue: **Redis**. MQTT: **Eclipse Mosquitto**.
+Database: **PostgreSQL (TimescaleDB compatible)**. Cache/queue: **Redis**. MQTT: **Eclipse Mosquitto**.
 
-## Snabbstart
-1. Installera **Docker** & **Docker Compose** och **.NET 8 SDK**.
-2. Kör installationsscriptet för att skapa lösningen och lägga till alla projekt:
+## Quickstart
+1. Install **Docker**, **Docker Compose**, and **.NET 8 SDK**.
+2. Run the setup script to create the solution and add all projects:
    ```powershell
    ./scripts/setup.ps1
    ```
-   (Detta skapar `Innovia.IoT.sln` och lägger in alla projekt.)
-   - Alternativt installera powershell extension till vsc och installera genom att köra filen. 
-3. `docker compose -f deploy/docker-compose.yml up -d` (startar db/redis/mosquitto)
-4. I ett nytt terminalfönster, kör tjänsterna lokalt (exempel):
+   (This creates `Innovia.IoT.sln` and adds all projects.)
+   - Alternatively, install the PowerShell extension in VS Code and run the script directly.
+3. `docker compose -f deploy/docker-compose.yml up -d` (starts db/redis/mosquitto)
+4. In a new terminal window, run the services locally (example):
    - `dotnet restore`
    - `dotnet build`
-   - Starta **DeviceRegistry.Api**, **Ingest.Gateway**, **Realtime.Hub**, **Portal.Adapter** (varsin terminal)
-5. Kör **Edge.Simulator** för att skicka data via MQTT.
-6. Koppla din egen portal mot **Realtime.Hub** (SignalR) och **Portal.Adapter** (REST).
+   - Start **DeviceRegistry.Api**, **Ingest.Gateway**, **Realtime.Hub**, **Portal.Adapter** (each in its own terminal)
+5. Run **Edge.Simulator** to send data via MQTT.
+6. Connect your own portal to **Realtime.Hub** (SignalR) and **Portal.Adapter** (REST).
 
-Se `docs/architecture.md` och `docs/api-specs.md` för detaljer.
+See `docs/architecture.md` and `docs/api-specs.md` for more details.
 
-## Guider: Köra och använda systemet
+## Guides: Running and Using the System
 
-### 1. Starta systemet
-- Säkerställ att **Docker Desktop** körs.
-- Kör `docker compose -f deploy/docker-compose.yml up -d` för att starta databasen (Postgres), Redis och Mosquitto.
-- Verifiera att containrarna är igång: `docker ps`.
+### 1. Start the system
+- Ensure that **Docker Desktop** is running.
+- Run `docker compose -f deploy/docker-compose.yml up -d` to start the database (Postgres), Redis, and Mosquitto.
+- Verify containers: `docker ps`.
 
-### 2. Starta tjänsterna
-- Öppna separata terminaler för varje tjänst:
+### 2. Start the services
+- Open separate terminals for each service:
   ```bash
   cd src/DeviceRegistry.Api && dotnet run
   cd src/Ingest.Gateway && dotnet run
   cd src/Realtime.Hub && dotnet run
   cd src/Portal.Adapter && dotnet run
   ```
-- Swagger finns på respektive port, t.ex. http://localhost:5101/swagger.
+- Swagger is available on each service port, e.g. http://localhost:5101/swagger.
 
-### 3. Skapa en tenant och en device
-- Skapa tenant via DeviceRegistry:
+### 3. Create a tenant and a device
+- Create a tenant via DeviceRegistry:
   ```bash
   curl -X POST http://localhost:5101/api/tenants \
     -H "Content-Type: application/json" \
     -d '{ "name": "Innovia Hub", "slug": "innovia" }'
   ```
-- Skapa en device under tenant:
+- Create a device under a tenant:
   ```bash
   curl -X POST http://localhost:5101/api/tenants/<TENANT_ID>/devices \
     -H "Content-Type: application/json" \
     -d '{ "model":"Acme CO2-Temp", "serial":"dev-101", "status":"active" }'
   ```
 
-### 4. Skicka in mätdata
+### 4. Send measurement data
 - Via Ingest HTTP:
   ```bash
   curl -X POST http://localhost:5102/ingest/http/innovia \
@@ -79,16 +79,16 @@ Se `docs/architecture.md` och `docs/api-specs.md` för detaljer.
     }'
   ```
 
-### 5. Läs data via Portal.Adapter
-- Hämta mätserier:
+### 5. Read data via Portal.Adapter
+- Fetch measurement series:
   ```bash
   curl "http://localhost:5104/portal/innovia/devices/<DEVICE_ID>/series?type=co2&from=2025-09-01T00:00:00Z&to=2025-10-01T23:59:59Z"
   ```
-- Du får tillbaka JSON med tidsstämplade datapunkter.
+- Returns JSON with timestamped datapoints.
 
-### 6. Realtidsdata
-- Anslut till SignalR-hubben (Realtime.Hub) på `http://localhost:5103/hub/telemetry`.
-- Exempel i JavaScript:
+### 6. Real-time data
+- Connect to the SignalR hub (Realtime.Hub) at `http://localhost:5103/hub/telemetry`.
+- Example in JavaScript:
   ```js
   const connection = new signalR.HubConnectionBuilder()
     .withUrl("http://localhost:5103/hub/telemetry")
@@ -99,11 +99,14 @@ Se `docs/architecture.md` och `docs/api-specs.md` för detaljer.
   ```
 
 ### 7. Tips
-- Använd Swagger för att testa endpoints.
-- Kolla databasen med `docker exec -it <db-container> psql -U postgres -d innovia -c "\dt"`.
-- Kombinera DeviceRegistry + Ingest + Portal.Adapter för end-to-end-flöde.
+- Use Swagger to test endpoints.
+- Inspect the database with:
+  ```bash
+  docker exec -it <db-container> psql -U postgres -d innovia -c "\dt"
+  ```
+- Combine DeviceRegistry + Ingest + Portal.Adapter for an end-to-end flow.
 
-## Ports (förslag)
+## Ports (suggested)
 - DeviceRegistry.Api: http://localhost:5101
 - Ingest.Gateway:    http://localhost:5102
 - Realtime.Hub:      http://localhost:5103
@@ -112,17 +115,17 @@ Se `docs/architecture.md` och `docs/api-specs.md` för detaljer.
 - PostgreSQL:        localhost:5432
 - Redis:             localhost:6379
 
-## EF Core migreringar
-Skapa & kör migreringar i **DeviceRegistry.Api** och **Ingest.Gateway**. Exempel:
+## EF Core migrations
+Create & run migrations in **DeviceRegistry.Api** and **Ingest.Gateway**. Example:
 ```bash
 cd src/DeviceRegistry.Api
 dotnet ef migrations add Init --project DeviceRegistry.Api.csproj
 dotnet ef database update
 ```
-(Se till att ha verktygen: `dotnet tool install --global dotnet-ef`)
+(Ensure you have the tools: `dotnet tool install --global dotnet-ef`)
 
-## Tips för uppgiften
-- Implementera HMAC för HTTP-ingest.
-- Lägg till ny sensortyp & visualisering.
-- Lägg på RBAC/JWT och tenant-isolering.
-- Bygg webhook-sändare i Portal.Adapter.
+## Assignment Tips
+- Implement HMAC for HTTP ingest.
+- Add a new sensor type & visualization.
+- Add RBAC/JWT and tenant isolation.
+- Build webhook sender in Portal.Adapter.
