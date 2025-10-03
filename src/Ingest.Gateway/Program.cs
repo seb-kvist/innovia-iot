@@ -2,6 +2,7 @@ using Innovia.Shared.DTOs;
 using Microsoft.EntityFrameworkCore;
 using FluentValidation;
 using System.Net.Http.Json;
+using Microsoft.AspNetCore.SignalR.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<IngestDbContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("Db")));
@@ -16,7 +17,29 @@ builder.Services.AddSingleton<DeviceRegistryConfig>(sp =>
     var cfg = sp.GetRequiredService<IConfiguration>().GetSection("DeviceRegistry");
     return new DeviceRegistryConfig { BaseUrl = cfg?["BaseUrl"] ?? "http://localhost:5101" };
 });
+// Realtime publisher (SignalR client)
+builder.Services.AddSingleton(new RealtimeConfig
+{
+    HubUrl = "http://localhost:5103/hub/telemetry"
+});
+builder.Services.AddSingleton<HubConnection>(sp =>
+{
+    var cfg = sp.GetRequiredService<RealtimeConfig>();
+    return new HubConnectionBuilder()
+        .WithUrl(cfg.HubUrl)
+        .WithAutomaticReconnect()
+        .Build();
+});
+builder.Services.AddSingleton<IRealtimePublisher, SignalRRealtimePublisher>();
+
 var app = builder.Build();
+
+// Start SignalR hub connection
+using (var scope = app.Services.CreateScope())
+{
+    var hub = scope.ServiceProvider.GetRequiredService<HubConnection>();
+    await hub.StartAsync();
+}
 
 // Ensure database and tables exist (quick-start dev convenience)
 using (var scope = app.Services.CreateScope())
@@ -92,7 +115,8 @@ public class IngestService
 {
     private readonly IngestDbContext _db;
     private readonly DeviceRegistryClient _registry;
-    public IngestService(IngestDbContext db, DeviceRegistryClient registry) { _db = db; _registry = registry; }
+    private readonly IRealtimePublisher _rt;
+    public IngestService(IngestDbContext db, DeviceRegistryClient registry, IRealtimePublisher rt) { _db = db; _registry = registry; _rt = rt; }
     public async Task ProcessAsync(string tenant, MeasurementBatch payload)
     {
         // Resolve tenant and device using DeviceRegistry (tenant slug + device serial)
@@ -109,6 +133,12 @@ public class IngestService
             });
         }
         await _db.SaveChangesAsync();
+
+        // Publish in realtime
+        foreach (var m in payload.Metrics)
+        {
+            await _rt.PublishAsync(tenant, ids.DeviceId, m.Type, m.Value, payload.Timestamp);
+        }
     }
 }
 
@@ -147,4 +177,33 @@ public class DeviceRegistryClient
 
     private record TenantDto(Guid Id, string Name, string Slug);
     private record DeviceDto(Guid Id, Guid TenantId, Guid? RoomId, string Model, string Serial, string Status);
+}
+
+public class RealtimeConfig
+{
+    public string HubUrl { get; set; } = "http://localhost:5103/hub/telemetry";
+}
+
+public interface IRealtimePublisher
+{
+    Task PublishAsync(string tenantSlug, Guid deviceId, string type, double value, DateTimeOffset time);
+}
+
+public class SignalRRealtimePublisher : IRealtimePublisher
+{
+    private readonly HubConnection _conn;
+    public SignalRRealtimePublisher(HubConnection conn) => _conn = conn;
+
+    public async Task PublishAsync(string tenantSlug, Guid deviceId, string type, double value, DateTimeOffset time)
+    {
+        var payload = new
+        {
+            TenantSlug = tenantSlug,
+            DeviceId = deviceId,
+            Type = type,
+            Value = value,
+            Time = time
+        };
+        await _conn.InvokeAsync("PublishMeasurement", payload);
+    }
 }
