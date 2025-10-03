@@ -1,10 +1,19 @@
+using Microsoft.Extensions.Logging;
 using Innovia.Shared.DTOs;
 using Microsoft.EntityFrameworkCore;
 using FluentValidation;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.SignalR.Client;
+using MQTTnet;
+using MQTTnet.Client;
+using MQTTnet.Protocol;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
+// Trim noisy logs: hide EF Core SQL and HttpClient chatter
+builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
+builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database", LogLevel.Warning);
+builder.Logging.AddFilter("System.Net.Http.HttpClient", LogLevel.Warning);
 builder.Services.AddDbContext<IngestDbContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("Db")));
 builder.Services.AddScoped<IngestService>();
 builder.Services.AddScoped<IValidator<MeasurementBatch>, MeasurementBatchValidator>();
@@ -78,6 +87,73 @@ app.MapGet("/ingest/debug/device/{deviceId:guid}", async (Guid deviceId, IngestD
     var latest = await db.Measurements.Where(m => m.DeviceId == deviceId).OrderByDescending(m => m.Time).Take(5).ToListAsync();
     return Results.Ok(new { deviceId, count, latest });
 });
+
+// --- MQTT subscriber: consume Edge.Simulator messages and reuse the same processing pipeline ---
+var mqttFactory = new MqttFactory();
+var mqttClient = mqttFactory.CreateMqttClient();
+var mqttOptions = new MqttClientOptionsBuilder()
+    .WithTcpServer("localhost", 1883)
+    .Build();
+
+// Subscribe to tenants/{tenantSlug}/devices/{serial}/measurements
+var mqttTopic = "tenants/+/devices/+/measurements";
+
+mqttClient.ApplicationMessageReceivedAsync += async e =>
+{
+    try
+    {
+        var topic = e.ApplicationMessage.Topic ?? string.Empty;
+        var parts = topic.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        // Expected: tenants/{tenantSlug}/devices/{serial}/measurements
+        if (parts.Length >= 5 && parts[0] == "tenants" && parts[2] == "devices")
+        {
+            var tenantSlug = parts[1];
+            var serial = parts[3];
+
+            // Deserialize payload into MeasurementBatch (same shape as HTTP ingest)
+            var payloadBytes = e.ApplicationMessage.PayloadSegment.ToArray();
+            var jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var batch = JsonSerializer.Deserialize<MeasurementBatch>(payloadBytes, jsonOptions);
+
+            if (batch is null)
+            {
+                Console.WriteLine($"[MQTT] Skipping: could not deserialize payload on topic '{topic}'");
+                return;
+            }
+
+            // Ensure batch.DeviceId (serial) is set/consistent
+            if (string.IsNullOrWhiteSpace(batch.DeviceId))
+            {
+                batch.DeviceId = serial;
+            }
+
+            using var scope = app.Services.CreateScope();
+            var svc = scope.ServiceProvider.GetRequiredService<IngestService>();
+            await svc.ProcessAsync(tenantSlug, batch);
+
+            Console.WriteLine($"[MQTT] Ingested {batch.Metrics?.Count ?? 0} metrics for serial '{serial}' in tenant '{tenantSlug}' at {batch.Timestamp:o}");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[MQTT] Handler error: {ex.Message}");
+    }
+};
+
+try
+{
+    await mqttClient.ConnectAsync(mqttOptions);
+    await mqttClient.SubscribeAsync(new MqttTopicFilterBuilder()
+        .WithTopic(mqttTopic)
+        .WithAtLeastOnceQoS()
+        .Build());
+    Console.WriteLine($"[MQTT] Subscribed to '{mqttTopic}' on localhost:1883");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"[MQTT] Failed to connect/subscribe: {ex.Message}");
+}
+// --- end MQTT subscriber ---
 
 app.Run();
 
