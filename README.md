@@ -123,9 +123,3 @@ dotnet ef migrations add Init --project DeviceRegistry.Api.csproj
 dotnet ef database update
 ```
 (Ensure you have the tools: `dotnet tool install --global dotnet-ef`)
-
-## Assignment Tips
-- Implement HMAC for HTTP ingest.
-- Add a new sensor type & visualization.
-- Add RBAC/JWT and tenant isolation.
-- Build webhook sender in Portal.Adapter.
