@@ -36,12 +36,21 @@ This fork is aligned with InnoviaHubSeb. The key runtime assumptions and URLs ar
    ./scripts/seed-seb-data.ps1
    ```
    This creates the tenant "Sebastians Hub" and 10 test devices (toshi001-toshi010).
-5. (Optional) Start MQTT simulator to simulate data:
+   **IMPORTANT**: The script will print a TenantId. Copy this ID!
+
+5. **Update InnoviaHubSeb configuration**:
+   - Open `InnoviaHubSeb/Backend/appsettings.json`
+   - Find the `InnoviaIot` section
+   - Replace the `TenantId` value with the TenantId printed by the seed script
+   - Example: `"TenantId": "c5ba0b5e-04a2-402a-97dd-c61e7bb9adc0"`
+
+6. (Optional) Start MQTT simulator to simulate data:
    ```bash
    cd src/Edge.Simulator && dotnet run
    ```
-6. Start your main app (InnoviaHubSeb) - it's already configured!
-7. Navigate to the IoT page (admin only) and see real-time data.
+
+7. Start your main app (InnoviaHubSeb) - it's now properly configured!
+8. Navigate to the IoT page (admin only) and see real-time data.
 
 See `docs/architecture.md` and `docs/api-specs.md` for more details.
 
