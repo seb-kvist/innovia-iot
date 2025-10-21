@@ -1,4 +1,4 @@
-# Innovia Hub – IoT API (Monorepo, .NET 8)
+# Innovia Hub – IoT API (Monorepo, .NET 8) - Adjusted for InnoviaHubSeb (https://github.com/seb-kvist/InnoviaHubSeb)
 
 Innovia Hub is a comprehensive IoT platform for smart buildings and office hubs, enabling organizations to seamlessly connect, manage, and monitor IoT devices and sensors at scale. The system provides robust APIs and real-time data integration for efficient facility management and automation.
 
@@ -14,21 +14,34 @@ This monorepo contains all core services: Device Registry, Ingest Gateway, Realt
 
 Database: **PostgreSQL (TimescaleDB compatible)**. Cache/queue: **Redis**. MQTT: **Eclipse Mosquitto**.
 
-## Quickstart
+## Quickstart (Seb fork)
+This fork is aligned with InnoviaHubSeb. The key runtime assumptions and URLs are:
+- DeviceRegistry.Api → http://localhost:5101
+- Ingest.Gateway → http://localhost:5102
+- Realtime.Hub → http://localhost:5103
+- Portal.Adapter → http://localhost:5104
+- Tenant slug used by portal and simulator: `sebastians-hub`
+
 1. Install **Docker**, **Docker Compose**, and **.NET 8 SDK**.
-2. Run the setup script to create the solution and add all projects:
-   ```powershell
-   ./scripts/setup.ps1
+2. Start infra: `docker compose -f deploy/docker-compose.yml up -d` (Postgres, Redis, Mosquitto)
+3. Run the services (each in a separate terminal):
+   ```bash
+   cd src/DeviceRegistry.Api && dotnet run
+   cd src/Ingest.Gateway   && dotnet run
+   cd src/Realtime.Hub     && dotnet run
+   cd src/Portal.Adapter   && dotnet run
    ```
-   (This creates `Innovia.IoT.sln` and adds all projects.)
-   - Alternatively, install the PowerShell extension in VS Code and run the script directly.
-3. `docker compose -f deploy/docker-compose.yml up -d` (starts db/redis/mosquitto)
-4. In a new terminal window, run the services locally (example):
-   - `dotnet restore`
-   - `dotnet build`
-   - Start **DeviceRegistry.Api**, **Ingest.Gateway**, **Realtime.Hub**, **Portal.Adapter** (each in its own terminal)
-5. Run **Edge.Simulator** to send data via MQTT.
-6. Connect your own portal to **Realtime.Hub** (SignalR) and **Portal.Adapter** (REST).
+4. Seed InnoviaHubSeb data (run once after DeviceRegistry.Api is up):
+   ```powershell
+   ./scripts/seed-seb-data.ps1
+   ```
+   This creates the tenant "Sebastians Hub" and 10 test devices (toshi001-toshi010).
+5. (Optional) Start MQTT simulator to simulate data:
+   ```bash
+   cd src/Edge.Simulator && dotnet run
+   ```
+6. Start your main app (InnoviaHubSeb) - it's already configured!
+7. Navigate to the IoT page (admin only) and see real-time data.
 
 See `docs/architecture.md` and `docs/api-specs.md` for more details.
 
@@ -49,24 +62,25 @@ See `docs/architecture.md` and `docs/api-specs.md` for more details.
   ```
 - Swagger is available on each service port, e.g. http://localhost:5101/swagger.
 
-### 3. Create a tenant and a device
+### 3. (Optional) Create a tenant and a device
+- Only needed if you didn't run the seed in step 4 of the Quickstart section, or you want to add extra custom devices. If `scripts/seed-seb-data.ps1` has been executed, you can skip this step.
 - Create a tenant via DeviceRegistry:
   ```bash
   curl -X POST http://localhost:5101/api/tenants \
     -H "Content-Type: application/json" \
-    -d '{ "name": "Innovia Hub", "slug": "innovia" }'
+    -d '{ "name": "Sebastians Hub", "slug": "sebastians-hub" }'
   ```
 - Create a device under a tenant:
   ```bash
   curl -X POST http://localhost:5101/api/tenants/<TENANT_ID>/devices \
     -H "Content-Type: application/json" \
-    -d '{ "model":"Acme CO2-Temp", "serial":"dev-101", "status":"active" }'
+    -d '{ "model":"Toshi-Maestro-Temp-333", "serial":"toshi001", "status":"active" }'
   ```
 
 ### 4. Send measurement data
 - Via Ingest HTTP:
   ```bash
-  curl -X POST http://localhost:5102/ingest/http/innovia \
+  curl -X POST http://localhost:5102/ingest/http/sebastians-hub \
     -H "Content-Type: application/json" \
     -d '{
       "deviceId": "dev-101",
@@ -82,11 +96,11 @@ See `docs/architecture.md` and `docs/api-specs.md` for more details.
 ### 5. Read data via Portal.Adapter
 - Fetch measurement series:
   ```bash
-  curl "http://localhost:5104/portal/innovia/devices/<DEVICE_ID>/series?type=co2&from=2025-09-01T00:00:00Z&to=2025-10-01T23:59:59Z"
+  curl "http://localhost:5104/portal/sebastians-hub/devices/<DEVICE_ID>/series?type=co2&from=2025-09-01T00:00:00Z&to=2025-10-01T23:59:59Z"
   ```
 - Returns JSON with timestamped datapoints.
 
-### 6. Real-time data
+### 6. Real-time data (portal integration reference)
 - Connect to the SignalR hub (Realtime.Hub) at `http://localhost:5103/hub/telemetry`.
 - Example in JavaScript:
   ```js
@@ -94,7 +108,7 @@ See `docs/architecture.md` and `docs/api-specs.md` for more details.
     .withUrl("http://localhost:5103/hub/telemetry")
     .build();
   await connection.start();
-  await connection.invoke("JoinTenant", "innovia");
+  await connection.invoke("JoinTenant", "sebastians-hub");
   connection.on("measurementReceived", data => console.log("Realtime:", data));
   ```
 

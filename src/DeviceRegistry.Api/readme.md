@@ -2,11 +2,11 @@
 DeviceRegistry.Api är tjänsten som hanterar **tenants** (organisationer/kunder) och deras **devices** (IoT-enheter). Alla övriga delar av systemet bygger på att registryt är korrekt konfigurerat.
 
 ## Översikt
-- **Tenants**: Representerar en kund eller ett kontorshotell (t.ex. "Innovia Hub").
+- **Tenants**: Representerar en kund eller ett kontorshotell (t.ex. "Sebastians Hub").
 - **Devices**: Representerar en sensor/enhet som tillhör en tenant, identifierad med ett unikt `serial`.
 
 ## Översikt
-- **Tenants**: Representerar en kund eller ett kontorshotell (t.ex. "Innovia Hub").
+- **Tenants**: Representerar en kund eller ett kontorshotell (t.ex. "Sebastians Hub").
 - **Devices**: Representerar en sensor/enhet som tillhör en tenant, identifierad med ett unikt `serial`.
 
 ## Bas-URL
@@ -33,13 +33,13 @@ Content-Type: application/json
 **Body:**
 ```json
 
-  "name": "Innovia Hub",
-  "slug": "innovia"
+  "name": "Sebastians Hub",
+  "slug": "sebastians-hub"
 
 ```
   "id": "44a8ce94-888e-478c-8007-3b28544fdf51",
-  "name": "Innovia Hub",
-  "slug": "innovia"
+  "name": "Sebastians Hub",
+  "slug": "sebastians-hub"
 
 ```
 
@@ -59,7 +59,7 @@ GET /api/tenants/by-slug/{slug}
 
 **Exempel:**
 ```
-GET /api/tenants/by-slug/innovia
+GET /api/tenants/by-slug/sebastians-hub
 ```
 
 ---
@@ -112,7 +112,7 @@ GET /api/tenants/44a8ce94-888e-478c-8007-3b28544fdf51/devices/by-serial/dev-101
 
 ## Användningsflöde
 
-1. **Skapa tenant** (t.ex. "Innovia Hub").
+1. **Skapa tenant** (t.ex. "Sebastians Hub").
 2. **Lägg till devices** under den tenantens `tenantId`.
 3. Dessa devices kan sedan ta emot data via **Ingest.Gateway**. Ingest löser tenant+serial → device GUID genom DeviceRegistry.
 4. Data blir åtkomligt via **Portal.Adapter** och i realtid via **Realtime.Hub**.
@@ -130,7 +130,7 @@ GET /api/tenants/44a8ce94-888e-478c-8007-3b28544fdf51/devices/by-serial/dev-101
 DeviceRegistry.Api is the service responsible for managing **tenants** (organizations/customers) and their **devices** (IoT units). All other parts of the system depend on the registry being correctly configured.
 
 ## Overview
-- **Tenants**: Represent an organization or business unit (e.g., "Innovia Hub").
+- **Tenants**: Represent an organization or business unit (e.g., "Sebastians Hub").
 - **Devices**: Represent a sensor/device belonging to a tenant, identified by a unique `serial`.
 
 ## Base URL
@@ -157,8 +157,8 @@ Content-Type: application/json
 **Body:**
 ```json
 {
-  "name": "Innovia Hub",
-  "slug": "innovia"
+  "name": "Sebastians Hub",
+  "slug": "sebastians-hub"
 }
 ```
 
@@ -166,8 +166,8 @@ Content-Type: application/json
 ```json
 {
   "id": "44a8ce94-888e-478c-8007-3b28544fdf51",
-  "name": "Innovia Hub",
-  "slug": "innovia"
+  "name": "Sebastians Hub",
+  "slug": "sebastians-hub"
 }
 ```
 
@@ -187,7 +187,7 @@ GET /api/tenants/by-slug/{slug}
 
 **Example:**
 ```
-GET /api/tenants/by-slug/innovia
+GET /api/tenants/by-slug/sebastians-hub
 ```
 
 ---
@@ -241,7 +241,7 @@ GET /api/tenants/44a8ce94-888e-478c-8007-3b28544fdf51/devices/by-serial/dev-101
 
 ## Usage Flow
 
-1. **Create a tenant** (e.g., "Innovia Hub").
+1. **Create a tenant** (e.g., "Sebastians Hub").
 2. **Add devices** under that tenant’s `tenantId`.
 3. These devices can then receive data through **Ingest.Gateway**. Ingest resolves tenant+serial → device GUID via DeviceRegistry.
 4. Data becomes accessible through **Portal.Adapter** and in real-time via **Realtime.Hub**.

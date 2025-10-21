@@ -83,7 +83,7 @@ Returns how many rows exist in the database for the given device, plus the 5 mos
 ## Example with curl
 
 ```bash
-curl -i -X POST http://localhost:5102/ingest/http/innovia \
+curl -i -X POST http://localhost:5102/ingest/http/sebastians-hub \
   -H "Content-Type: application/json" \
   -d '{
     "deviceId": "dev-101",

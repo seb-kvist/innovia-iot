@@ -49,7 +49,7 @@ The **Edge.Simulator** is a console application that simulates IoT edge devices 
    ```
    Edge.Simulator starting… connecting to MQTT at localhost:1883
    ✅ Connected to MQTT broker.
-   [2025-10-03T12:00:00Z] Published to 'tenants/innovia/devices/dev-101/measurements': { …payload… }
+   [2025-10-03T12:00:00Z] Published to 'tenants/sebastians-hub/devices/dev-101/measurements': { …payload… }
    ```
 
 ---

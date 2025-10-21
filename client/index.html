@@ -13,7 +13,7 @@
             .withAutomaticReconnect()
             .build();
         await connection.start();
-        await connection.invoke("JoinTenant", "innovia");
+        await connection.invoke("JoinTenant", "sebastians-hub");
         connection.on("measurementReceived", m => console.log("Realtime:", m));
         })();
         </script>
