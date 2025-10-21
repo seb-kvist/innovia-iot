@@ -43,15 +43,15 @@ try {
 # 2. Create devices
 $devices = @(
     @{ model = "Toshi-Maestro-Temp-333"; serial = "toshi001" },
-    @{ model = "Toshi-Maestro-Temp-444"; serial = "toshi002" },
-    @{ model = "Toshi-Maestro-Temp-555"; serial = "toshi003" },
-    @{ model = "Toshi-Maestro-Temp-666"; serial = "toshi004" },
-    @{ model = "Toshi-Maestro-Temp-777"; serial = "toshi005" },
-    @{ model = "Toshi-Maestro-Temp-888"; serial = "toshi006" },
-    @{ model = "Toshi-Maestro-Temp-999"; serial = "toshi007" },
-    @{ model = "Toshi-Maestro-Temp-111"; serial = "toshi008" },
-    @{ model = "Toshi-Maestro-Temp-222"; serial = "toshi009" },
-    @{ model = "Toshi-Maestro-Temp-000"; serial = "toshi010" }
+    @{ model = "Toshi-Maestro-Temp-666"; serial = "toshi002" },
+    @{ model = "Toshi-Maestro-Temp-999"; serial = "toshi003" },
+    @{ model = "Toshi-Maestro-CO2-33"; serial = "toshi004" },
+    @{ model = "Toshi-Maestro-CO2-66"; serial = "toshi005" },
+    @{ model = "Toshi-Maestro-CO2-99"; serial = "toshi006" },
+    @{ model = "Toshi-Maestro-Humidity-3"; serial = "toshi007" },
+    @{ model = "Toshi-Maestro-Humidity-6"; serial = "toshi008" },
+    @{ model = "Toshi-Maestro-Humidity-9"; serial = "toshi009" },
+    @{ model = "Ihsot-Maestro-Motion-1337"; serial = "toshi010" }
 )
 
 Write-Host "Creating $($devices.Count) devices..." -ForegroundColor Yellow
