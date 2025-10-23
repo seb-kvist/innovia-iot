@@ -33,6 +33,7 @@ This fork is aligned with InnoviaHubSeb. The key runtime assumptions and URLs ar
    cd src/Portal.Adapter   && dotnet run
    ```
 4. Seed InnoviaHubSeb data (run once after DeviceRegistry.Api is up):
+   
    Windows (PowerShell):
    ```sql
    cd innovia-iot/scripts
@@ -49,19 +50,19 @@ This fork is aligned with InnoviaHubSeb. The key runtime assumptions and URLs ar
    This creates the tenant "Sebastians Hub" and 10 test devices (toshi001-toshi010).
    **IMPORTANT**: The script will print a TenantId. Copy this ID!
 
-5. **Update InnoviaHubSeb configuration**:
+6. **Update InnoviaHubSeb configuration**:
    - Open `InnoviaHubSeb/Backend/appsettings.json`
    - Find the `InnoviaIot` section
    - Replace the `TenantId` value with the TenantId printed by the seed script
    - Example: `"TenantId": "c5ba0b5e-04a2-402a-97dd-c61e7bb9adc0"`
 
-6. (Optional) Start MQTT simulator to simulate data:
+7. (Optional) Start MQTT simulator to simulate data:
    ```bash
    cd src/Edge.Simulator && dotnet run
    ```
 
-7. Start your main app (InnoviaHubSeb) - it's now properly configured!
-8. Navigate to the IoT page (admin only) and see real-time data.
+8. Start your main app (InnoviaHubSeb) - it's now properly configured!
+9. Navigate to the IoT page (admin only) and see real-time data.
 
 See `docs/architecture.md` and `docs/api-specs.md` for more details.
 
