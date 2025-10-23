@@ -1,4 +1,5 @@
-# Innovia Hub – IoT API (Monorepo, .NET 8) - Adjusted for InnoviaHubSeb (https://github.com/seb-kvist/InnoviaHubSeb)
+# Innovia Hub – IoT API (Monorepo, .NET 8)
+Adjusted for InnoviaHubSeb (https://github.com/seb-kvist/InnoviaHubSeb)
 
 Innovia Hub is a comprehensive IoT platform for smart buildings and office hubs, enabling organizations to seamlessly connect, manage, and monitor IoT devices and sensors at scale. The system provides robust APIs and real-time data integration for efficient facility management and automation.
 
@@ -32,8 +33,18 @@ This fork is aligned with InnoviaHubSeb. The key runtime assumptions and URLs ar
    cd src/Portal.Adapter   && dotnet run
    ```
 4. Seed InnoviaHubSeb data (run once after DeviceRegistry.Api is up):
-   ```powershell
-   ./scripts/seed-seb-data.ps1
+   Windows (PowerShell):
+   ```sql
+   cd innovia-iot/scripts
+   ./seed-seb-data.ps1
+   ```
+   MacOS/Linux:
+   ```sql
+   cd innovia-iot/scripts
+   chmod +x seed-seb-data.sh
+   ./seed-seb-data.sh
+
+   # If you get "jq: command not found" → run: brew install jq
    ```
    This creates the tenant "Sebastians Hub" and 10 test devices (toshi001-toshi010).
    **IMPORTANT**: The script will print a TenantId. Copy this ID!
